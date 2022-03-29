@@ -3,5 +3,5 @@
 .packages
 vendors/
 
-# Conventional directory for build output.
-build/
+pubspec.lock
+analysis_options.yaml
