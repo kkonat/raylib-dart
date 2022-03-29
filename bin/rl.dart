@@ -8,25 +8,23 @@ void main() {
 
   initLibrary(windows: raylibPath);
 
-  const screenWidth = 1280 ~/ 2;
-  const screenHeight = 720 ~/ 2;
-  const minFontSize = 20;
-  const maxFontSize = 25;
+  const halfWidth = 1280 ~/ 2;
+  const halfHeight = 720 ~/ 2;
+  const fontSize = 20;
 
   setConfigFlags(ConfigFlags.msaa4xHint);
-  initWindow(screenWidth * 2, screenHeight * 2, 'Hello Raylib!');
+  initWindow(halfWidth * 2, halfHeight * 2, 'Hello Raylib!');
   setTargetFPS(60);
 
-  const text = 'Welcome to Raylib-Dart!';
-
-  var fontSize = minFontSize;
+  const msg = 'Welcome to Raylib-Dart!';
+  String timeStr;
 
   var time = 0.0;
   var zoomMult = 1.0;
 
   final camera = Camera2D(
-      offset: Vector2(screenWidth.toDouble(), screenHeight.toDouble()),
-      target: Vector2(screenWidth.toDouble(), screenHeight.toDouble()));
+      offset: Vector2(halfWidth.toDouble(), halfHeight.toDouble()),
+      target: Vector2(halfWidth.toDouble(), halfHeight.toDouble()));
 
   while (!windowShouldClose()) {
     //time += getFrameTime();
@@ -41,22 +39,25 @@ void main() {
     camera.rotation = sin(time * 3) * 40;
     camera.zoom.clamp(0.5, 2.5);
 
+    timeStr = DateTime.now().toString().split(' ')[1].split('.')[0];
     beginDrawing();
     clearBackground(Color.black);
 
     beginMode2D(camera);
-    drawCircle(screenWidth, screenHeight, 40, Color.red);
+    drawCircle(halfWidth, halfHeight, 40, Color.red);
     drawText(
-      text,
-      screenWidth - measureText(text, fontSize) ~/ 2,
-      screenHeight - 10,
+      msg,
+      halfWidth - measureText(msg, fontSize) ~/ 2,
+      halfHeight - 10,
       fontSize,
       Color.yellow,
     );
     endMode2D();
 
     drawFPS(32, 32);
-    drawText('Press up/down arrrows to scale', 32, screenHeight * 2 - 40, 40,
+    drawText(timeStr, halfWidth * 2 - 32 - measureText(timeStr, 20), 32, 20,
+        Color.darkGreen);
+    drawText('Press up/down arrrows to scale', 32, halfHeight * 2 - 40, 40,
         Color.darkGray);
 
     endDrawing();
