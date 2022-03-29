@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:raylib/raylib.dart';
+import 'package:raylib/src/modules/core/misc.dart';
 
 void main() {
   var raylibPath = '.\\raylib.dll';
@@ -10,60 +13,51 @@ void main() {
   const minFontSize = 20;
   const maxFontSize = 25;
 
-  initWindow(screenWidth, screenHeight, 'Hello Raylib!');
+  setConfigFlags(ConfigFlags.msaa4xHint);
+  initWindow(screenWidth * 2, screenHeight * 2, 'Hello Raylib!');
   setTargetFPS(60);
 
   const text = 'Welcome to Raylib-Dart!';
-  // Some allocation and casting to convert dart string into native c-string.
-  // final utf8Text = text.toNativeUtf8();
-  // final int8Text = utf8Text.cast<Int8>();
 
   var fontSize = minFontSize;
-  var reverse = false;
-  var time = 0.0;
 
-  final camera = Camera2D();
-  //var offset = Vector2(screenWidth / 2, screenHeight / 2);
-  //var target = Vector2(0, 0);
-  Camera2D();
+  var time = 0.0;
+  var zoomMult = 1.0;
+
+  final camera = Camera2D(
+      offset: Vector2(screenWidth.toDouble(), screenHeight.toDouble()),
+      target: Vector2(screenWidth.toDouble(), screenHeight.toDouble()));
 
   while (!windowShouldClose()) {
-    if (fontSize > maxFontSize) {
-      reverse = true;
-    } else if (fontSize < minFontSize) {
-      reverse = false;
-    }
-
-    time += getFrameTime();
-    if (time > 0.06) {
-      fontSize += reverse ? -1 : 1;
-      time -= 0.06;
-    }
-
+    //time += getFrameTime();
+    time += 0.016;
     if (isKeyDown(KeyboardKey.up)) {
-      camera.zoom += 0.1;
-    } else if (isKeyDown(KeyboardKey.down)) {
-      camera.zoom -= 0.1;
+      zoomMult += 0.1;
+    } else if (isKeyDown(KeyboardKey.down) && zoomMult >= 1.0) {
+      zoomMult -= 0.1;
     }
 
-    camera.zoom = camera.zoom.clamp(0.5, 2.5);
+    camera.zoom = (2.0 + sin(time) * 1.5) * zoomMult;
+    camera.rotation = sin(time * 3) * 40;
+    camera.zoom.clamp(0.5, 2.5);
 
     beginDrawing();
     clearBackground(Color.black);
 
-    drawFPS(32, 32);
-
     beginMode2D(camera);
-
+    drawCircle(screenWidth, screenHeight, 40, Color.red);
     drawText(
       text,
-      (screenWidth - measureText(text, fontSize)) ~/ 2,
-      screenHeight ~/ 2,
+      screenWidth - measureText(text, fontSize) ~/ 2,
+      screenHeight - 10,
       fontSize,
       Color.yellow,
     );
-
     endMode2D();
+
+    drawFPS(32, 32);
+    drawText('Press up/down arrrows to scale', 32, screenHeight * 2 - 40, 40,
+        Color.darkGray);
 
     endDrawing();
   }
